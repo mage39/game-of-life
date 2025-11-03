@@ -1,1 +1,4 @@
-gcc -g -Wall -Wextra -Wpedantic -fanalyzer -fsanitize=address,undefined -o out main.c
+#! /usr/bin/env bash
+# CFLAGS="${CFLAGS/\-O3/-O0}"
+echo $CFLAGS
+gcc $CFLAGS -lraylib -o out main.c
