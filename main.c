@@ -1,11 +1,12 @@
 #include <raylib.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <time.h>
 
 #define CLEAR (Color){0}
-#define X (512)
-#define Y (512)
+#define X (650)
+#define Y X
 
 typedef struct {
 	Texture2D pixTruTex, pixFlsTex;
@@ -16,7 +17,7 @@ typedef struct {
 } GameData;
 
 static GameData initGameData (void) {
-	constexpr int pixelSize = 4;
+	constexpr int pixelSize = 3;
 	GameData ret = {
 		.pixelSize = pixelSize,
 		.boardInfo = {
@@ -71,14 +72,17 @@ static void drawBoard (GameData dat) {
 
 static GameData updateBoard (GameData dat) {
 	GameData ret = dat;
+	int clampOffset (int t, int cap) {
+		if (t > cap) return t - cap;
+		else if (t < 0) return t + cap;
+		else return t;
+	}
 	int sumArea (int i, int j) {
 		int ret = 0;
 		for (int k = 0; k < 3; k++) {
 			for (int l = 0; l < 3; l++) {
-				int offsetX = (i + k - 1) % X;
-				int offsetY = (j + l - 1) % Y;
-				if (offsetX < 0) offsetX += X;
-				if (offsetY < 0) offsetY += Y;
+				int offsetX = clampOffset(i + k - 1, X);
+				int offsetY = clampOffset(j + l - 1, Y);
 				bool center = k == 1 && l == 1;
 				if (dat.board[offsetX][offsetY] && !center) ret++;
 			}
@@ -96,17 +100,34 @@ static GameData updateBoard (GameData dat) {
 	return ret;
 }
 
+static void showFPS (void) {
+	static int cnt = 0;
+	static float time = 0;
+	static char FPS[12] = {0};
+	Rectangle FPSframe = {5, 5, 50, 21};
+	time += GetFrameTime();
+	cnt++;
+	if (cnt > 99) {
+		sprintf(FPS, "%d", (int)(cnt / time));
+		time = 0;
+		cnt = 0;
+	}
+	DrawRectangleRec(FPSframe, BLACK);
+	DrawRectangleLinesEx(FPSframe, 2, RED);
+	DrawText(FPS, 10, 10, 12, WHITE);
+}
+
 int main (void) {
-	InitWindow(1024, 1024, "gol");
+	InitWindow(1920, 1080, "gol");
 	GameData dat = initGameData();
 	randomizeBoard(dat.board);
 	while (!WindowShouldClose()) {
-		// if (IsKeyPressed(KEY_N))
 		dat = updateBoard(dat);
 		if (IsKeyPressed(KEY_R)) randomizeBoard(dat.board);
 		BeginDrawing();
 		ClearBackground(BLACK);
 		drawBoard(dat);
+		showFPS();
 		EndDrawing();
 	}
 	CloseWindow();
