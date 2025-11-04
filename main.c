@@ -26,7 +26,7 @@ static GameData initGameData (void) {
 		},
 	};
 	Image pixelTrue = GenImageColor(ret.pixelSize, ret.pixelSize, WHITE);
-	Image pixelFals = GenImageColor(ret.pixelSize, ret.pixelSize, CLEAR);
+	Image pixelFals = GenImageColor(ret.pixelSize, ret.pixelSize, BLACK);
 	if (ret.pixelSize > 6) {
 		Rectangle border = {0, 0, ret.pixelSize, ret.pixelSize};
 		ImageDrawRectangleLines(&pixelFals, border, ret.pixelSize / 12, WHITE);
@@ -125,7 +125,7 @@ int main (void) {
 		dat = updateBoard(dat);
 		if (IsKeyPressed(KEY_R)) randomizeBoard(dat.board);
 		BeginDrawing();
-		ClearBackground(BLACK);
+		// ClearBackground(BLACK);
 		drawBoard(dat);
 		showFPS();
 		EndDrawing();
